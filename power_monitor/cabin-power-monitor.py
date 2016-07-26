@@ -137,12 +137,12 @@ while True:
 
         #write to the screen #
         ###comment this out when not testing####
-        #print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "1",reading1,volts1,AMPS1,count)
-        #print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "2",reading2,volts2,AMPS2,count)
-        #print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "3",reading3,volts3,AMPS3,count)
-        #print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "4",reading4,volts4,AMPS4,count)
-        #print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "5",reading5,volts5,AMPS5,count)
-        #print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "6",reading6,volts6,AMPS6,count)
+       # print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "1",reading1,volts1,AMPS1,count)
+       # print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "2",reading2,volts2,AMPS2,count)
+       # print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "3",reading3,volts3,AMPS3,count)
+       # print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "4",reading4,volts4,AMPS4,count)
+       # print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "5",reading5,volts5,AMPS5,count)
+       # print pt,'\t%s\t%f\t%f\t%f\t%i' % ( "6",reading6,volts6,AMPS6,count)
 
         if (now.tm_sec == 0)&(count>10): #if new minute, write data to file
                                          # and write only one value for second $
