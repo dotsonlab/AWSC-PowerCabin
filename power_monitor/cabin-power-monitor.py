@@ -1,5 +1,6 @@
 import Adafruit_BBIO.ADC as ADC
 import time
+import os
 
 ## not using ntplib for network time protocol or a real time clock,
 ## i am using processor time for the time calls.
@@ -33,36 +34,52 @@ currentday=now.tm_mday
 currentyear=now.tm_year
 filename = "{0}_{1}_{2}_cabin-power.csv".format(currentyear, currentmonth, currentday)
 
-#### informative messaging for starting storage file
-print "Opening ",filename, " for appending..."
-print "reading analog inputs and storing data..."
-file=open(filename,"a")
-file.write("Time,Reading,Volts,Amps\n")
-file.close()
+restart = True
+
+TOT_KWH1 = 0
+TOT_KWH2 = 0
+TOT_KWH3 = 0
+TOT_KWH4 = 0
+TOT_KWH5 = 0
+TOT_KWH6 = 0
+
+LAST_TOT_KWH2 = 0
+LAST_TOT_KWH1 = 0
+LAST_TOT_KWH3 = 0
+LAST_TOT_KWH4 = 0
+LAST_TOT_KWH5 = 0
+LAST_TOT_KWH6 = 0
+
 #initialize averaging counter
 AVE_reading1=0
 AVE_volts1=0
 AVE_AMPS1=0
+AVE_WATTS1=0
 
 AVE_reading2=0
 AVE_volts2=0
 AVE_AMPS2=0
+AVE_WATTS2=0
 
 AVE_reading3=0
 AVE_volts3=0
 AVE_AMPS3=0
+AVE_WATTS3=0
 
 AVE_reading4=0
 AVE_volts4=0
 AVE_AMPS4=0
+AVE_WATTS4=0
 
 AVE_reading5=0
 AVE_volts5=0
 AVE_AMPS5=0
+AVE_WATTS5=0
 
 AVE_reading6=0
 AVE_volts6=0
 AVE_AMPS6=0
+AVE_WATTS6=0
 
 count=0
 
@@ -71,11 +88,17 @@ count=0
 while True:
         #read analog pin #
         reading1 = ADC.read(sensor_pin1)
+        time.sleep(0.1)
         reading2 = ADC.read(sensor_pin2)
+        time.sleep(0.1)
         reading3 = ADC.read(sensor_pin3)
+        time.sleep(0.1)
         reading4 = ADC.read(sensor_pin4)
+        time.sleep(0.1)
         reading5 = ADC.read(sensor_pin5)
+        time.sleep(0.1)
         reading6 = ADC.read(sensor_pin6)
+        time.sleep(0.1)
 
         # increment counter for average calculation
         count = count+1
@@ -129,8 +152,8 @@ while True:
         #uncomment if setting used#
         #AMPS = volts / 0.25
         AMPS1=volts1/0.25 #Volts / (V/A) = amps
-	AMPS4=volts4/0.5 #Volts / (V/A) = amps
-	AMPS6=volts6/0.5 #Volts / (V/A) = amps
+        AMPS4=volts4/0.25 #Volts / (V/A) = amps
+        AMPS6=volts6/0.25 #Volts / (V/A) = amps
         # high jumper -- CT output scaled for high, 0-50 amps
         #uncomment if setting used#
         #AMPS = volts / 0.1
@@ -176,28 +199,36 @@ while True:
                 AVE_AMPS6=(AVE_AMPS6+AMPS6)/count
                 print pt,'AVE-\t%s\t%f\t%f\t%f' % ( "6",AVE_reading6,AVE_volts6,AVE_AMPS6)
 
+                AVE_WATTS1=120.0 * AVE_AMPS1
+                TOT_KWH1=(AVE_WATTS1/1000)/60.0 + LAST_TOT_KWH1
+                LAST_TOT_KWH1=TOT_KWH1
 
+                AVE_WATTS2=120.0 * AVE_AMPS2
+                TOT_KWH2=(AVE_WATTS2/1000)/60.0 + LAST_TOT_KWH2
+                LAST_TOT_KWH2=TOT_KWH2
+
+                AVE_WATTS3=120.0 * AVE_AMPS3
+                TOT_KWH3=(AVE_WATTS3/1000)/60.0 + LAST_TOT_KWH3
+                LAST_TOT_KWH3=TOT_KWH3
+
+                AVE_WATTS4=120.0 * AVE_AMPS4
+                TOT_KWH4=(AVE_WATTS4/1000)/60.0 + LAST_TOT_KWH4
+                LAST_TOT_KWH4=TOT_KWH4         
+
+                AVE_WATTS5=120.0 * AVE_AMPS5
+                TOT_KWH5=(AVE_WATTS5/1000)/60.0 + LAST_TOT_KWH5
+                LAST_TOT_KWH5=TOT_KWH5
+
+                AVE_WATTS6=120.0 * AVE_AMPS6
+                TOT_KWH6=(AVE_WATTS6/1000)/60.0 + LAST_TOT_KWH6
+                LAST_TOT_KWH6=TOT_KWH6  
+                                             
                 #open file to append
                 file=open(filename,"a")
                 #add first column date/time stamp
                 file.write(pt)
                 #add next columns with raw reading, and converted voltage
-                file.write(",%s,%f,%f,%f\n" % ("1",AVE_reading1,AVE_volts1,AVE_AMPS1))
-                #add first column date/time stamp
-                file.write(pt)
-                file.write(",%s,%f,%f,%f\n" % ("2",AVE_reading2,AVE_volts2,AVE_AMPS2))
-                #add first column date/time stamp
-                file.write(pt)
-                file.write(",%s,%f,%f,%f\n" % ("3",AVE_reading3,AVE_volts3,AVE_AMPS3))
-                #add first column date/time stamp
-                file.write(pt)
-                file.write(",%s,%f,%f,%f\n" % ("4",AVE_reading4,AVE_volts4,AVE_AMPS4))
-                #add first column date/time stamp
-                file.write(pt)
-                file.write(",%s,%f,%f,%f\n" % ("5",AVE_reading5,AVE_volts5,AVE_AMPS5))
-                #add first column date/time stamp
-                file.write(pt)
-                file.write(",%s,%f,%f,%f\n" % ("6",AVE_reading6,AVE_volts6,AVE_AMPS6))
+                file.write(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % (AVE_AMPS1,AVE_WATTS1,TOT_KWH1,AVE_AMPS2,AVE_WATTS2,TOT_KWH2,AVE_AMPS3,AVE_WATTS3,TOT_KWH3,AVE_AMPS4,AVE_WATTS4,TOT_KWH4,AVE_AMPS5,AVE_WATTS5,TOT_KWH5,AVE_AMPS6,AVE_WATTS6,TOT_KWH6))
                 #close file, in case of program termination prematurely,
                 file.close()
                 #if MM/DD/YR changes, update filename
@@ -254,7 +285,47 @@ while True:
                 AVE_volts6=AVE_volts6+volts6
                 AVE_AMPS6=AVE_AMPS6+AMPS6
 
+        if (os.path.isfile(filename) and restart):
+            #restart ensures that it will only execute this once.
+            restart = False
+            #restarting the file
+            file = open(filename)
+            #grab last non-blank line
+            last = None
+            for line in (line for line in file if line.rstrip('\n')):
+                last = line
+            #set totalflow to last known value
+            LAST_TOT_KWH1 = float(last.split(",")[3])
+            LAST_TOT_KWH2 = float(last.split(",")[6])
+            LAST_TOT_KWH3 = float(last.split(",")[9])
+            LAST_TOT_KWH4 = float(last.split(",")[12])
+            LAST_TOT_KWH5 = float(last.split(",")[15])
+            LAST_TOT_KWH6 = float(last.split(",")[18])
 
+        elif not (os.path.isfile(filename)):
+            #Initial and daily startup
+            TOT_KWH1 = 0
+            TOT_KWH2 = 0
+            TOT_KWH3 = 0
+            TOT_KWH4 = 0
+            TOT_KWH5 = 0
+            TOT_KWH6 = 0
+
+            LAST_TOT_KWH2 = 0
+            LAST_TOT_KWH1 = 0
+            LAST_TOT_KWH3 = 0
+            LAST_TOT_KWH4 = 0
+            LAST_TOT_KWH5 = 0
+            LAST_TOT_KWH6 = 0
+            
+            file=open(filename,"a")
+            #informative messaging for starting storage file
+            print "Opening ",filename, " for appending..."
+            print "reading analog inputs and storing data..."
+            file.write("time,amps1,watts1,totkw1,amps2,watts2,totkw2,amps3,watts3,totkw3,amps4,watts4,totkw4,amps5,watts5,totkw5,amps6,watts6,totkw6\n")
+            file.write(pt)
+            file.write(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % (AVE_AMPS1,AVE_WATTS1,TOT_KWH1,AVE_AMPS2,AVE_WATTS2,TOT_KWH2,AVE_AMPS3,AVE_WATTS3,TOT_KWH3,AVE_AMPS4,AVE_WATTS4,TOT_KWH4,AVE_AMPS5,AVE_WATTS5,TOT_KWH5,AVE_AMPS6,AVE_WATTS6,TOT_KWH6))
+            file.close()
 
         #sleep for (.1 s)
         time.sleep(.1)
